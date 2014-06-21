@@ -1,0 +1,7 @@
+This is OSM ( Open Street Map ) parser.
+
+Currently aimed at extracting railway information out of melbourne dataset
+
+
+Data was extracted from
+http://metro.teczno.com/
