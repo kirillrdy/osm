@@ -46,9 +46,9 @@ func main() {
 
 	decoder := xml.NewDecoder(osm_file)
 
-	nodes := map[uint64]*Node{}
-	ways := map[uint64]*Way{}
-	relations := map[uint64]*Relation{}
+	nodes := map[uint64]Node{}
+	ways := map[uint64]Way{}
+	relations := map[uint64]Relation{}
 
 	osm := Osm{}
 	err = decoder.Decode(&osm)
@@ -60,15 +60,15 @@ func main() {
 	var frankstone_line uint64 = 344911
 
 	for _, node := range osm.Node {
-		nodes[node.Id] = &node
+		nodes[node.Id] = node
 	}
 
 	for _, way := range osm.Way {
-		ways[way.Id] = &way
+		ways[way.Id] = way
 	}
 
 	for _, relation := range osm.Relation {
-		relations[relation.Id] = &relation
+		relations[relation.Id] = relation
 	}
 
 	fmt.Println(relations[frankstone_line].Id)
