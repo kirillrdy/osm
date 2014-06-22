@@ -1,6 +1,7 @@
 package main
 
 import (
+	"compress/bzip2"
 	"encoding/xml"
 	"fmt"
 	"log"
@@ -39,13 +40,16 @@ func (way *Way) IsRailWay() bool {
 }
 
 func main() {
-	osm_file, err := os.Open("melbourne.osm")
+	bzip_file, err := os.Open("melbourne.osm.bz2")
 	if err != nil {
 		log.Panic(err)
 	}
 
+	osm_file := bzip2.NewReader(bzip_file)
+
 	decoder := xml.NewDecoder(osm_file)
 
+	//For fast lookup
 	nodes := map[uint64]Node{}
 	ways := map[uint64]Way{}
 	relations := map[uint64]Relation{}
