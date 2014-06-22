@@ -13,6 +13,27 @@ type Osm struct {
 	Node     []Node     `xml:"node"`
 	Way      []Way      `xml:"way"`
 	Relation []Relation `xml:"relation"`
+
+	nodesById    map[uint64]Node
+	waysById     map[uint64]Way
+	relationById map[uint64]Relation
+}
+
+func (osm *Osm) BuildIndex() {
+
+	osm.nodesById = map[uint64]Node{}
+	osm.waysById = map[uint64]Way{}
+	osm.relationById = map[uint64]Relation{}
+
+	for _, node := range osm.Node {
+		osm.nodesById[node.Id] = node
+	}
+	for _, way := range osm.Way {
+		osm.waysById[way.Id] = way
+	}
+	for _, relation := range osm.Relation {
+		osm.relationById[relation.Id] = relation
+	}
 }
 
 func LoadPackagedMelbourne() *Osm {
@@ -66,4 +87,40 @@ func (osm *Osm) SaveToJson(filename string) {
 
 	json_encoder := json.NewEncoder(json_file)
 	json_encoder.Encode(osm)
+}
+
+func (osm *Osm) NodeById(id uint64) *Node {
+	node := osm.nodesById[id]
+	return &node
+
+	for _, node := range osm.Node {
+		if node.Id == id {
+			return &node
+		}
+	}
+	return nil
+}
+
+func (osm *Osm) WayById(id uint64) *Way {
+	way := osm.waysById[id]
+	return &way
+
+	for _, way := range osm.Way {
+		if way.Id == id {
+			return &way
+		}
+	}
+	return nil
+}
+
+func (osm *Osm) RelationById(id uint64) *Relation {
+	relation := osm.relationById[id]
+
+	return &relation
+	for _, relation := range osm.Relation {
+		if relation.Id == id {
+			return &relation
+		}
+	}
+	return nil
 }
