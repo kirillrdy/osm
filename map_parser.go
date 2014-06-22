@@ -1,15 +1,5 @@
 package osm
 
-import (
-	"compress/bzip2"
-	"encoding/json"
-	"encoding/xml"
-	"log"
-	"os"
-	"path"
-	"runtime"
-)
-
 func HasTagByKeyValue(item Taged, key, value string) bool {
 	for _, tag := range item.Tags() {
 		if tag.Key == key && tag.Value == value {
@@ -35,67 +25,6 @@ func HasTagByKey(item Taged, name string) bool {
 		}
 	}
 	return false
-}
-
-func (way *Way) IsRailWay() bool {
-	return HasTagByKeyValue(way, "railway", "rail")
-}
-
-func (relation *Relation) IsTrainRoute() bool {
-	return HasTagByKeyValue(relation, "route", "train")
-}
-
-func LoadFromBz2() *Osm {
-	bzip_file, err := os.Open(packageDir() + "/melbourne.osm.bz2")
-	if err != nil {
-		log.Panic(err)
-	}
-
-	osm_file := bzip2.NewReader(bzip_file)
-
-	decoder := xml.NewDecoder(osm_file)
-	osm := Osm{}
-	err = decoder.Decode(&osm)
-	if err != nil {
-		panic(err)
-	}
-	return &osm
-
-}
-
-func packageDir() string {
-	_, current_file, _, _ := runtime.Caller(0)
-	package_dir := path.Dir(current_file)
-	return package_dir
-}
-
-func LoadFromJson() *Osm {
-	json_file, err := os.Open(packageDir() + "/melbourne.json")
-	if err != nil {
-		log.Panic(err)
-	}
-
-	decoder := json.NewDecoder(json_file)
-	osm := Osm{}
-	err = decoder.Decode(&osm)
-	if err != nil {
-		panic(err)
-	}
-	return &osm
-
-}
-
-func saveJson(osm *Osm) {
-	json_file, err := os.Create("melbourne.json")
-
-	if err != nil {
-		panic(err)
-	}
-
-	defer json_file.Close()
-
-	json_encoder := json.NewEncoder(json_file)
-	json_encoder.Encode(osm)
 }
 
 //func main() {
