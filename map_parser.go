@@ -45,8 +45,8 @@ func (relation *Relation) IsTrainRoute() bool {
 	return HasTagByKeyValue(relation, "route", "train")
 }
 
-func loadFromBz2() *Osm {
-	bzip_file, err := os.Open("melbourne.osm.bz2")
+func LoadFromBz2() *Osm {
+	bzip_file, err := os.Open(packageDir() + "/melbourne.osm.bz2")
 	if err != nil {
 		log.Panic(err)
 	}
