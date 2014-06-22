@@ -1,12 +1,13 @@
-package main
+package osm
 
 import (
 	"compress/bzip2"
 	"encoding/json"
 	"encoding/xml"
-	"fmt"
 	"log"
 	"os"
+	"path"
+	"runtime"
 )
 
 func (way *Way) HasTagByKeyValue(key, value string) bool {
@@ -58,8 +59,14 @@ func loadFromBz2() *Osm {
 
 }
 
-func loadFromJson() *Osm {
-	json_file, err := os.Open("melbourne.json")
+func packageDir() string {
+	_, current_file, _, _ := runtime.Caller(0)
+	package_dir := path.Dir(current_file)
+	return package_dir
+}
+
+func LoadFromJson() *Osm {
+	json_file, err := os.Open(packageDir() + "/melbourne.json")
 	if err != nil {
 		log.Panic(err)
 	}
@@ -87,31 +94,41 @@ func saveJson(osm *Osm) {
 	json_encoder.Encode(osm)
 }
 
-func main() {
-
-	//osm := loadFromBz2()
-	osm := loadFromJson()
-
-	//For fast lookup
-	nodes := map[uint64]Node{}
-	ways := map[uint64]Way{}
-	relations := map[uint64](*Relation){}
-
-	var frankstone_line uint64 = 344911
-
-	for _, node := range osm.Node {
-		nodes[node.Id] = node
-	}
-
-	for _, way := range osm.Way {
-		ways[way.Id] = way
-	}
-
-	for _, relation := range osm.Relation {
-		relations[relation.Id] = &relation
-	}
-
-	fmt.Println(relations[frankstone_line].Id)
-	fmt.Println(relations[frankstone_line])
-
-}
+//func main() {
+//
+//	//osmOriginal := loadFromBz2()
+//	//saveJson(osmOriginal)
+//	osm := loadFromJson()
+//
+//	//For fast lookup
+//	nodes := map[uint64]Node{}
+//	ways := map[uint64]Way{}
+//	relations := map[uint64]Relation{}
+//
+//	var frankstone_line_id uint64 = 344911
+//
+//	for _, node := range osm.Node {
+//		nodes[node.Id] = node
+//	}
+//
+//	for _, way := range osm.Way {
+//		ways[way.Id] = way
+//	}
+//
+//	for _, relation := range osm.Relation {
+//		relations[relation.Id] = relation
+//	}
+//
+//	frankstone_line := relations[frankstone_line_id]
+//
+//	first_way_id := frankstone_line.Member[0].Ref
+//	first_way := ways[first_way_id]
+//	fmt.Println(first_way)
+//
+//	for _, nd := range first_way.Nd {
+//		node := nodes[nd.Ref]
+//		fmt.Printf("%f %f\n", node.Lat, node.Lon)
+//
+//	}
+//
+//}
