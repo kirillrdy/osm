@@ -10,8 +10,8 @@ import (
 	"runtime"
 )
 
-func (way *Way) HasTagByKeyValue(key, value string) bool {
-	for _, tag := range way.Tag {
+func HasTagByKeyValue(item Taged, key, value string) bool {
+	for _, tag := range item.Tags() {
 		if tag.Key == key && tag.Value == value {
 			return true
 		}
@@ -19,8 +19,8 @@ func (way *Way) HasTagByKeyValue(key, value string) bool {
 	return false
 }
 
-func (way *Way) HasTagByValue(name string) bool {
-	for _, tag := range way.Tag {
+func HasTagByValue(item Taged, name string) bool {
+	for _, tag := range item.Tags() {
 		if tag.Value == name {
 			return true
 		}
@@ -28,8 +28,8 @@ func (way *Way) HasTagByValue(name string) bool {
 	return false
 }
 
-func (way *Way) HasTagByKey(name string) bool {
-	for _, tag := range way.Tag {
+func HasTagByKey(item Taged, name string) bool {
+	for _, tag := range item.Tags() {
 		if tag.Key == name {
 			return true
 		}
@@ -38,7 +38,11 @@ func (way *Way) HasTagByKey(name string) bool {
 }
 
 func (way *Way) IsRailWay() bool {
-	return way.HasTagByKeyValue("railway", "rail")
+	return HasTagByKeyValue(way, "railway", "rail")
+}
+
+func (relation *Relation) IsTrainRoute() bool {
+	return HasTagByKeyValue(relation, "route", "train")
 }
 
 func loadFromBz2() *Osm {

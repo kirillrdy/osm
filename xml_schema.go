@@ -45,3 +45,15 @@ type Osm struct {
 	Way      []Way      `xml:"way"`
 	Relation []Relation `xml:"relation"`
 }
+
+type Taged interface {
+	Tags() []Tag
+}
+
+func (way Way) Tags() []Tag {
+	return way.Tag
+}
+
+func (relation Relation) Tags() []Tag {
+	return relation.Tag
+}
