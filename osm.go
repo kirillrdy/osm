@@ -9,37 +9,47 @@ import (
 )
 
 type Osm struct {
-	XMLName  xml.Name   `xml:"osm"`
-	Node     []Node     `xml:"node"`
-	Way      []Way      `xml:"way"`
-	Relation []Relation `xml:"relation"`
-
-	nodesById    map[uint64]Node
-	waysById     map[uint64]Way
-	relationById map[uint64]Relation
+	XMLName  xml.Name    `xml:"osm"`
+	Node     []*Node     `xml:"node"`
+	Way      []*Way      `xml:"way"`
+	Relation []*Relation `xml:"relation"`
 }
 
-func (osm *Osm) BuildIndex() {
-
-	osm.nodesById = map[uint64]Node{}
-	osm.waysById = map[uint64]Way{}
-	osm.relationById = map[uint64]Relation{}
-
-	for _, node := range osm.Node {
-		osm.nodesById[node.Id] = node
-	}
-	for _, way := range osm.Way {
-		osm.waysById[way.Id] = way
-	}
-	for _, relation := range osm.Relation {
-		osm.relationById[relation.Id] = relation
-	}
+//TODO move elsewhere
+// Used for fast querying
+type OsmIndex struct {
+	// these are for indexing
+	nodesById    map[uint64]*Node
+	waysById     map[uint64]*Way
+	relationById map[uint64]*Relation
 }
 
+func (osm *Osm) BuildIndex() OsmIndex {
+
+	index := OsmIndex{}
+
+	index.nodesById = map[uint64]*Node{}
+	index.waysById = map[uint64]*Way{}
+	index.relationById = map[uint64]*Relation{}
+
+	for i := range osm.Node {
+		index.nodesById[osm.Node[i].Id] = osm.Node[i]
+	}
+	for i := range osm.Way {
+		index.waysById[osm.Way[i].Id] = osm.Way[i]
+	}
+	for i := range osm.Relation {
+		index.relationById[osm.Relation[i].Id] = osm.Relation[i]
+	}
+	return index
+}
+
+// Loads packaged version of Melbourne OSM ( perhaps somewhat outdated )
 func LoadPackagedMelbourne() *Osm {
 	return LoadFromBz2(packageDir() + "/melbourne.osm.bz2")
 }
 
+// Loads bzip'ed xml
 func LoadFromBz2(filename string) *Osm {
 	bzip_file, err := os.Open(filename)
 	defer bzip_file.Close()
@@ -89,38 +99,14 @@ func (osm *Osm) SaveToJson(filename string) {
 	json_encoder.Encode(osm)
 }
 
-func (osm *Osm) NodeById(id uint64) *Node {
-	node := osm.nodesById[id]
-	return &node
-
-	for _, node := range osm.Node {
-		if node.Id == id {
-			return &node
-		}
-	}
-	return nil
+func (index *OsmIndex) NodeById(id uint64) *Node {
+	return index.nodesById[id]
 }
 
-func (osm *Osm) WayById(id uint64) *Way {
-	way := osm.waysById[id]
-	return &way
-
-	for _, way := range osm.Way {
-		if way.Id == id {
-			return &way
-		}
-	}
-	return nil
+func (index *OsmIndex) WayById(id uint64) *Way {
+	return index.waysById[id]
 }
 
-func (osm *Osm) RelationById(id uint64) *Relation {
-	relation := osm.relationById[id]
-
-	return &relation
-	for _, relation := range osm.Relation {
-		if relation.Id == id {
-			return &relation
-		}
-	}
-	return nil
+func (index *OsmIndex) RelationById(id uint64) *Relation {
+	return index.relationById[id]
 }
